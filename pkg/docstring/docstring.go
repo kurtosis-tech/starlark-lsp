@@ -20,15 +20,19 @@
 // Perhaps multiline.
 //
 // Another paragraph.
-//   With indentation.
+//
+//	With indentation.
 //
 // Args:
-//   arg1: desc,
-//     perhaps multiline, but must be intended.
-//   arg2: ...
+//
+//	arg1: desc,
+//	  perhaps multiline, but must be intended.
+//	arg2: ...
 //
 // Returns:
-//   Intended free form text.
+//
+//	Intended free form text.
+//
 // """
 //
 // Extracts all relevant parts of the docstring, deindending them as necessary.
@@ -115,11 +119,11 @@ type RemarkBlock struct {
 // The expected grammar (loosely, since it is complicated by indentation
 // handling):
 //
-//     Parsed -> Block*
-//     Block -> []string | (FieldsBlock | RemarkBlock)*
-//     Fields -> ("Args:" | "Field:" | ...) Field+
-//     Field -> "  <name>:" []string
-//     RemarkBlock -> ("Returns:" | "Note:" | "...") []string
+//	Parsed -> Block*
+//	Block -> []string | (FieldsBlock | RemarkBlock)*
+//	Fields -> ("Args:" | "Field:" | ...) Field+
+//	Field -> "  <name>:" []string
+//	RemarkBlock -> ("Returns:" | "Note:" | "...") []string
 //
 // Never fails. May return incomplete or even empty object if the string format
 // is unrecognized.
@@ -211,11 +215,11 @@ func readUntil(in []string, pred func(prev *string, line string) (stop bool)) (r
 //
 // It looks like this:
 //
-//    arg1: blah-blah,
-//       maybe more-blah-blah.
-//    arg2: shorter blah-blah.
+//	arg1: blah-blah,
+//	   maybe more-blah-blah.
+//	arg2: shorter blah-blah.
 //
-//    arg3:
+//	arg3:
 func parseFields(lines []string) []Field {
 	var fields []Field
 
@@ -236,11 +240,14 @@ func parseFields(lines []string) []Field {
 		// Combine the first line with the rest of the block.
 		all := trimEmptyLines(append([]string{firstLine}, deindent(block)...))
 
+		// DEPRECATED:
 		// Join lines by space. We assume argument descriptions do not use newlines
 		// in a syntax-significant way.
+		// NOTE FROM KURTOSIS-TECH: We changed this code to preserve newlines to preserve newlines for when the description
+		// of a field needs to be displayed somewhere (eg. frontend, CLI, etc.)
 		fields = append(fields, Field{
 			Name: name,
-			Desc: strings.Join(all, " "),
+			Desc: strings.Join(all, "\n"), // join by newline and not space
 		})
 	}
 
@@ -255,11 +262,11 @@ func parseFields(lines []string) []Field {
 //
 // E.g. this:
 //
-//   """Blah blah
+//	"""Blah blah
 //
-//   More blah.<space><space>
+//	More blah.<space><space>
 //
-//   """
+//	"""
 //
 // Results in ["blah blah", "", "More blah."].
 func normalizedLines(doc string) []string {
@@ -371,8 +378,8 @@ func hasLeadingSpace(s string) bool {
 // of a named block.
 //
 // We are pretty strict here to avoid misfiring on ':' that appear in sentences:
-//   * The title should start with the upper case ("Args", not "args").
-//   * No spaces allowed ("Returns", not "Return value").
+//   - The title should start with the upper case ("Args", not "args").
+//   - No spaces allowed ("Returns", not "Return value").
 func parseBlockTitle(l string) (title string, ok bool) {
 	t := strings.TrimSuffix(l, ":")
 	if len(t) == len(l) || len(t) == 0 {
