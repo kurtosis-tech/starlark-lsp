@@ -9,15 +9,15 @@ import (
 
 	sitter "github.com/smacker/go-tree-sitter"
 
-	"github.com/tilt-dev/starlark-lsp/pkg/docstring"
+	"github.com/kurtosis-tech/starlark-lsp/pkg/docstring"
 )
 
 // FunctionParameters extracts parameters from a function definition and
 // supports a mixture of positional parameters, default value parameters,
 // typed parameters*, and typed default value parameters*.
 //
-// * These are not valid Starlark, but we support them to enable using Python
-//   type-stub files for improved editor experience.
+//   - These are not valid Starlark, but we support them to enable using Python
+//     type-stub files for improved editor experience.
 const FunctionParameters = `
 (parameters ([
     (identifier) @name

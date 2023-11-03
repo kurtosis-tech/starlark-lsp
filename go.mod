@@ -1,4 +1,4 @@
-module github.com/tilt-dev/starlark-lsp
+module github.com/kurtosis-tech/starlark-lsp
 
 go 1.19
 

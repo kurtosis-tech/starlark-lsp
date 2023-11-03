@@ -58,6 +58,6 @@ The `Tiltfile` in this repository can be used while developing the language serv
 [go.lsp.dev]: https://go.lsp.dev/
 [Tree sitter]: https://tree-sitter.github.io/tree-sitter/
 [Tilt]: https://tilt.dev/
-[ext]: https://marketplace.visualstudio.com/items?itemName=tilt-dev.tiltfile
+[ext]: https://marketplace.visualstudio.com/items?itemName=.tiltfile
 [CONTRIBUTING.md]: https://github.com/tilt-dev/vscode-tilt/blob/main/CONTRIBUTING.md#language-server
 [vscode-tilt]: https://github.com/tilt-dev/vscode-tilt/

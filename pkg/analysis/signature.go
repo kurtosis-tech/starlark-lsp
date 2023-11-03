@@ -6,8 +6,8 @@ import (
 	sitter "github.com/smacker/go-tree-sitter"
 	"go.lsp.dev/protocol"
 
-	"github.com/tilt-dev/starlark-lsp/pkg/document"
-	"github.com/tilt-dev/starlark-lsp/pkg/query"
+	"github.com/kurtosis-tech/starlark-lsp/pkg/document"
+	"github.com/kurtosis-tech/starlark-lsp/pkg/query"
 )
 
 func (a *Analyzer) signatureInformation(doc document.Document, node *sitter.Node, args callWithArguments) (query.Signature, bool) {
@@ -114,9 +114,10 @@ type callWithArguments struct {
 // `call`.
 //
 // Currently, this supports two cases:
-// 	(1) Current node is inside of a `call`
-// 	(2) Current node is inside of an ERROR block where first child is an
-// 		`identifier`
+//
+//	(1) Current node is inside of a `call`
+//	(2) Current node is inside of an ERROR block where first child is an
+//		`identifier`
 func possibleCallInfo(doc document.Document, node *sitter.Node, pt sitter.Point) (args callWithArguments) {
 	for n := node; n != nil; n = n.Parent() {
 		if n.Type() == query.NodeTypeCall {
