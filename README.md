@@ -1,5 +1,8 @@
 # starlark-lsp
 
+[FORK NOTE]: Kurtosis-Tech forked this package to preserve newlines in field descriptions in the docstring package. 
+We need the newlines to be preserved for displaying field descriptions.
+
 A language server for [Starlark][starlark], a Python-inspired configuration language.
 
 Starlark-lsp uses [go.lsp.dev][] and [Tree sitter][] as its main dependencies to implement the LSP/JSON-RPC protocol and Starlark language analysis, respectively. It can either be used as a standalone executable (see pkg/cli) or as a Go library.
