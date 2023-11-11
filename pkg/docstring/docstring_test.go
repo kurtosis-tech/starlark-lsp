@@ -21,7 +21,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseFieldField_FullField(t *testing.T) {
+func TestParseField_FullField(t *testing.T) {
 	t.Parallel()
 
 	field, typeStr, desc, ok := parseFieldLine("greeting (string): This is a greeting")
@@ -31,7 +31,7 @@ func TestParseFieldField_FullField(t *testing.T) {
 	assert.Equal(t, "This is a greeting", desc)
 }
 
-func TestParseFieldField_FieldWithoutType(t *testing.T) {
+func TestParseField_FieldWithoutType(t *testing.T) {
 	t.Parallel()
 
 	field, typeStr, desc, ok := parseFieldLine("greeting: This is a greeting")
@@ -41,7 +41,7 @@ func TestParseFieldField_FieldWithoutType(t *testing.T) {
 	assert.Equal(t, "This is a greeting", desc)
 }
 
-func TestParseFieldField_FieldWithoutNameErrors(t *testing.T) {
+func TestParseField_FieldWithoutNameErrors(t *testing.T) {
 	t.Parallel()
 
 	_, _, _, ok := parseFieldLine("(string): This is a greeting")
