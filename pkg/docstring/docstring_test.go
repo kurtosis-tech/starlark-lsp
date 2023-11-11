@@ -21,6 +21,33 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestParseFieldField_FullField(t *testing.T) {
+	t.Parallel()
+
+	field, typeStr, desc, ok := parseFieldLine("greeting (string): This is a greeting")
+	assert.True(t, ok)
+	assert.Equal(t, "greeting", field)
+	assert.Equal(t, "string", typeStr)
+	assert.Equal(t, "This is a greeting", desc)
+}
+
+func TestParseFieldField_FieldWithoutType(t *testing.T) {
+	t.Parallel()
+
+	field, typeStr, desc, ok := parseFieldLine("greeting: This is a greeting")
+	assert.True(t, ok)
+	assert.Equal(t, "greeting", field)
+	assert.Equal(t, "", typeStr)
+	assert.Equal(t, "This is a greeting", desc)
+}
+
+func TestParseFieldField_FieldWithoutNameErrors(t *testing.T) {
+	t.Parallel()
+
+	_, _, _, ok := parseFieldLine("(string): This is a greeting")
+	assert.False(t, ok)
+}
+
 func TestParse(t *testing.T) {
 	t.Parallel()
 
@@ -69,11 +96,11 @@ func TestParse(t *testing.T) {
 		{
 			Title: "Args",
 			Fields: []Field{
-				{"roles", "a single role (as acl.role) or a list of roles to assign, blah-blah multiline."},
-				{"groups", "a single group name or a list of groups to assign the role to."},
-				{"stuff", "line1 line2 line3"},
-				{"users", "a single user email or a list of emails to assign the role to."},
-				{"empty", ""},
+				{"roles", "", "a single role (as acl.role) or a list of roles to assign,\nblah-blah multiline."},
+				{"groups", "", "a single group name or a list of groups to assign the role to."},
+				{"stuff", "", "line1\nline2\nline3"},
+				{"users", "", "a single user email or a list of emails to assign the role to."},
+				{"empty", "", ""},
 			},
 		},
 	}, out.Fields)
@@ -138,4 +165,27 @@ func TestDeindent(t *testing.T) {
 	t.Run("Works with tabs too", func(t *testing.T) {
 		assert.Equal(t, []string{"", "", "a", "b", "\tc"}, deindent([]string{"\t\t", "", "\ta", "\tb", "\t\tc"}))
 	})
+}
+
+func TestArgsWithType(t *testing.T) {
+	t.Parallel()
+
+	out := Parse(`An example function
+
+    Args:
+        greeting (string): The greeting that we should put inside the greeting.txt file
+`)
+
+	assert.Equal(t, "An example function", out.Description)
+
+	assert.Equal(t, []FieldsBlock{
+		{
+			Title: "Args",
+			Fields: []Field{
+				{"greeting", "string", "The greeting that we should put inside the greeting.txt file"},
+			},
+		},
+	}, out.Fields)
+
+	assert.Nil(t, nil, out.Remarks)
 }

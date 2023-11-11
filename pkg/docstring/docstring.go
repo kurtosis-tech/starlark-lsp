@@ -102,8 +102,9 @@ type FieldsBlock struct {
 
 // Field represents single "<name>: blah-blah-blah" definition.
 type Field struct {
-	Name string // name of the field
-	Desc string // field's description, "\n" is replaced with " "
+	Name    string // name of the field
+	TypeStr string // the type string (if any) as indicated in parentheses following the name
+	Desc    string // field's description
 }
 
 // RemarkBlock represents things like "Returns:\n blah-blah".
@@ -122,7 +123,7 @@ type RemarkBlock struct {
 //	Parsed -> Block*
 //	Block -> []string | (FieldsBlock | RemarkBlock)*
 //	Fields -> ("Args:" | "Field:" | ...) Field+
-//	Field -> "  <name>:" []string
+//	Field -> "  <name> (<type>):" []string
 //	RemarkBlock -> ("Returns:" | "Note:" | "...") []string
 //
 // Never fails. May return incomplete or even empty object if the string format
@@ -169,7 +170,7 @@ func Parse(doc string) Parsed {
 			if l == "" || hasLeadingSpace(l) {
 				continue
 			}
-			if _, _, ok := parseFieldLine(l); !ok {
+			if _, _, _, ok := parseFieldLine(l); !ok {
 				isFieldsBlock = false // found a non-field line, give up
 				break
 			}
@@ -225,7 +226,7 @@ func parseFields(lines []string) []Field {
 
 	for len(lines) > 0 {
 		// Grab the name of the field from the first line.
-		name, firstLine, ok := parseFieldLine(lines[0])
+		name, typeStr, firstLine, ok := parseFieldLine(lines[0])
 		if !ok {
 			break
 		}
@@ -246,8 +247,9 @@ func parseFields(lines []string) []Field {
 		// NOTE FROM KURTOSIS-TECH: We changed this code to preserve newlines to preserve newlines for when the description
 		// of a field needs to be displayed somewhere (eg. frontend, CLI, etc.)
 		fields = append(fields, Field{
-			Name: name,
-			Desc: strings.Join(all, "\n"), // join by newline and not space
+			Name:    name,
+			TypeStr: typeStr,
+			Desc:    strings.Join(all, "\n"), // join by newline and not space
 		})
 	}
 
@@ -394,19 +396,23 @@ func parseBlockTitle(l string) (title string, ok bool) {
 	return t, true
 }
 
-// fieldRe matches "field: ...".
+// fieldRe matches "field (type): ...", with the type being optional
 //
 // fieldRe matches arguments in docstrings, allowing spaces around the name and type
-var fieldRe = regexp.MustCompile(`^(\S.*?)\s*:\s*(.*)$`)
+var fieldRe = regexp.MustCompile(`^([^ ()]+?)\s*(?:\((\S*?)\))?\s*:\s*(.*)$`)
 
 // parseFieldLine recognized strings like "field<space>*:<space>*...".
 //
 // Returns the extracted field name and what is left of the line.
 //
-// No spaces are allowed in the field name part.
-func parseFieldLine(l string) (field, rest string, ok bool) {
+// KURTOSIS NOTE: We've modified this function to accept both:
+// - field<space>*:<space>*....
+// - field<space>*(...)<space>*:<space>*...
+// This means that typeStr can be emptystring, but field cannot
+func parseFieldLine(l string) (field, typeStr, rest string, ok bool) {
 	if m := fieldRe.FindStringSubmatch(l); m != nil {
-		return m[1], m[2], true
+		field, typeStr, rest = m[1], m[2], m[3]
+		return field, typeStr, rest, field != ""
 	}
 	return
 }
