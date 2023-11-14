@@ -189,3 +189,25 @@ func TestArgsWithType(t *testing.T) {
 
 	assert.Nil(t, nil, out.Remarks)
 }
+
+func TestNoDescription(t *testing.T) {
+	t.Parallel()
+
+	out := Parse(`
+    Args:
+        greeting (string): The greeting that we should put inside the greeting.txt file
+	`)
+
+	assert.Equal(t, "An example function", out.Description)
+
+	assert.Equal(t, []FieldsBlock{
+		{
+			Title: "Args",
+			Fields: []Field{
+				{"greeting", "string", "The greeting that we should put inside the greeting.txt file"},
+			},
+		},
+	}, out.Fields)
+
+	assert.Nil(t, nil, out.Remarks)
+}
